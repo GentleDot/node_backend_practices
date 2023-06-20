@@ -81,8 +81,9 @@ app.post("/users", function (req, res) {
 
     // 3. 이메일에 가입환영 템플릿 전송
     sendWelcomeEmail({email, myTemplate})
+        .then(res.send("가입 완료!"))
+        .catch(err => console.error(err))
 
-    res.send("가입 완료!")
 })
 
 app.listen(3000)
