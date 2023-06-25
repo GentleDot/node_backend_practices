@@ -1,0 +1,16 @@
+version: '3.7'
+
+# container 설정
+services:
+  # express
+  my-express:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+  # mongo
+  my-mongo:
+    image: mongo:6.0.6
+    ports:
+      - 27017:27017
