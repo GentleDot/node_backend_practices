@@ -8,6 +8,7 @@ import 'dotenv/config'
 import {checkEmail, generateWelcomeTemplate, sendWelcomeEmail} from './api/email/email.js'
 import {getToday} from './api/email/utils.js';
 import mongoose from 'mongoose'
+import {Board} from "./models/board.model.js";
 
 const app = express();
 const swaggerSpec = swaggerJsdoc(options);
@@ -17,25 +18,35 @@ app.use(express.json())
 app.use(cors())
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.get('/boards', function (req, res) {
+app.get('/boards', async function (req, res) {
     // 1. DB 접속 후 데이터를 조회
-    const result = [
-        {number: 1, writer: "철수", title: "제목입력", contents: "내용!"},
-        {number: 2, writer: "영희", title: "냉무", contents: "냉무!"},
-        {number: 3, writer: "홍길동", title: "테스트 게시물", contents: "test"}
-    ];
+    // const result = [
+    //     {number: 1, writer: "철수", title: "제목입력", contents: "내용!"},
+    //     {number: 2, writer: "영희", title: "냉무", contents: "냉무!"},
+    //     {number: 3, writer: "홍길동", title: "테스트 게시물", contents: "test"}
+    // ];
+
+    const result = await Board.find()
+
     // 2. DB에서 꺼내온 결과를 응답 (response)으로 전달
     res.send(result);
 
 })
 
-app.post('/boards', function (req, res) {
+app.post('/boards', async function (req, res) {
     // 1. client에서 보내준 데이터 확인하기
     console.log(req)
     console.log("======")
     console.log(req.body)
 
     // 2. DB 접속 후 데이터를 저장
+    const board = new Board({
+        writer: req.body.writer,
+        title: req.body.title,
+        contents: req.body.contents
+    });
+
+    await board.save()
 
     // 3. 저장 결과를 응답으로 전달
     res.send("게시물 등록에 성공하였습니다.")
@@ -86,9 +97,7 @@ app.post("/users", function (req, res) {
     res.send("가입 완료!")
 })
 
-// mongoDB 접속 (mongoose 사용)
 mongoose.connect("mongodb://my-mongo:27017/mydocker")
     .then(() => console.log("db 접속에 성공했습니다."))
     .catch(() => console.log("db 접속에 실패했습니다."))
-
 app.listen(3000)
